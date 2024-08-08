@@ -27,11 +27,11 @@ func init() {
 	}
 
 	AppMode = viper.GetString("server.app_mode")
-	HttpPort = viper.GetString("server.HttpPort")
-	JwtKey = viper.GetString("server.JwtKey")
+	HttpPort = viper.GetString("server.http_port")
+	JwtKey = viper.GetString("server.jwt_key")
 	Host = viper.GetString("mysql.host")
 	Port = viper.GetString("mysql.port")
 	User = viper.GetString("mysql.user")
 	Password = viper.GetString("mysql.password")
-	Dbname = viper.GetString("mysql.dbname")
+	Dbname = viper.GetString("mysql.db_name")
 }
