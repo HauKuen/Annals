@@ -1,0 +1,15 @@
+app_name = "Annals"
+
+[server]
+# debug 开发模式，release 生产模式
+AppMode = "debug"
+HttpPort = ":3000"
+JwtKey = "yourKey"
+
+
+[mysql]
+host = "ip"
+port = 3306
+user = "user"
+password = "password"
+dbname = "dbname"
