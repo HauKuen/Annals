@@ -14,9 +14,37 @@ func GetUserInfo(c *gin.Context) {
 	data, code := model.GetUser(id)
 	maps["username"] = data.Username
 	maps["role"] = data.Role
+	c.JSON(
+		http.StatusOK, gin.H{
+			"status":  code,
+			"data":    maps,
+			"message": errmsg.GetErrMsg(code),
+		},
+	)
+}
+
+// CheckUser 用户是否存在
+func CheckUser(c *gin.Context) {
+	username := c.Query("username")
+	code := model.CheckUser(username)
 	c.JSON(http.StatusOK, gin.H{
 		"status":  code,
 		"message": errmsg.GetErrMsg(code),
-		"data":    maps,
+	})
+}
+
+// AddUser 添加用户
+func AddUser(c *gin.Context) {
+	var data model.User
+	_ = c.ShouldBindJSON(&data)
+	code := model.CheckUser(data.Username)
+	if code == errmsg.SUCCESS {
+		model.CreateUser(&data)
+	} else {
+		code = errmsg.ErrorUsernameUsed
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"status":  code,
+		"message": errmsg.GetErrMsg(code),
 	})
 }

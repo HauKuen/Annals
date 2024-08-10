@@ -12,7 +12,9 @@ func InitRouter() {
 
 	r := router.Group("/api/v1")
 	{
-		r.GET("/user/:id", v1.GetUserInfo)
+		r.GET("user/:id", v1.GetUserInfo)
+		r.POST("user/add", v1.AddUser)
+
 	}
 	_ = router.Run(utils.HttpPort)
 }
