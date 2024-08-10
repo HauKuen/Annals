@@ -27,9 +27,11 @@ func InitDb() {
 
 	if err != nil {
 		panic("failed to connect database, err:" + err.Error())
-		return
 	}
-	_ = db.AutoMigrate(&User{})
+	err = db.AutoMigrate(&User{})
+	if err != nil {
+		fmt.Println("auto migrate failed, err:" + err.Error())
+	}
 
 	sqlDB, _ := db.DB()
 	// 设置连接池中的最大闲置连接数。
