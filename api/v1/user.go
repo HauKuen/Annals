@@ -23,6 +23,26 @@ func GetUserInfo(c *gin.Context) {
 	)
 }
 
+func GetUsers(c *gin.Context) {
+	pageSize, _ := strconv.Atoi(c.Query("pageSize"))
+	pageNum, _ := strconv.Atoi(c.Query("pageNum"))
+	if pageSize <= 0 {
+		pageSize = 10 // 默认页面大小
+	}
+	if pageNum <= 0 {
+		pageNum = 1 // 默认页码为第一页
+	}
+
+	data, total := model.GetUsers(pageSize, pageNum)
+	code := errmsg.SUCCESS
+	c.JSON(http.StatusOK, gin.H{
+		"status":  code,
+		"data":    data,
+		"total":   total,
+		"message": errmsg.GetErrMsg(code),
+	})
+}
+
 // CheckUser 用户是否存在
 func CheckUser(c *gin.Context) {
 	username := c.Query("username")

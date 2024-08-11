@@ -13,6 +13,7 @@ func InitRouter() {
 	r := router.Group("/api/v1")
 	{
 		r.GET("user/:id", v1.GetUserInfo)
+		r.GET("users", v1.GetUsers)
 		r.POST("user/add", v1.AddUser)
 
 	}
