@@ -111,3 +111,23 @@ func DeleteUser(id int) int {
 	}
 	return respcode.SUCCESS
 }
+
+// EditUser 编辑用户信息
+func EditUser(id int, data *User) int {
+	var user User
+
+	err := db.First(&user, id).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return respcode.ErrorUserNotExist // 1003
+		}
+		return respcode.ERROR
+	}
+
+	err = db.Model(&user).Updates(data).Error
+	if err != nil {
+		return respcode.ERROR
+	}
+
+	return respcode.SUCCESS
+}
