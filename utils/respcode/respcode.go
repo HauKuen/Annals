@@ -1,4 +1,4 @@
-package errmsg
+package respcode
 
 const (
 	SUCCESS = 200

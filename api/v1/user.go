@@ -2,7 +2,7 @@ package v1
 
 import (
 	"github.com/HauKuen/Annals/model"
-	"github.com/HauKuen/Annals/utils/errmsg"
+	"github.com/HauKuen/Annals/utils/respcode"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -18,7 +18,7 @@ func GetUserInfo(c *gin.Context) {
 		http.StatusOK, gin.H{
 			"status":  code,
 			"data":    maps,
-			"message": errmsg.GetErrMsg(code),
+			"message": respcode.GetErrMsg(code),
 		},
 	)
 }
@@ -34,12 +34,12 @@ func GetUsers(c *gin.Context) {
 	}
 
 	data, total := model.GetUsers(pageSize, pageNum)
-	code := errmsg.SUCCESS
+	code := respcode.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
 		"status":  code,
 		"data":    data,
 		"total":   total,
-		"message": errmsg.GetErrMsg(code),
+		"message": respcode.GetErrMsg(code),
 	})
 }
 
@@ -49,7 +49,7 @@ func CheckUser(c *gin.Context) {
 	code := model.CheckUser(username)
 	c.JSON(http.StatusOK, gin.H{
 		"status":  code,
-		"message": errmsg.GetErrMsg(code),
+		"message": respcode.GetErrMsg(code),
 	})
 }
 
@@ -58,13 +58,23 @@ func AddUser(c *gin.Context) {
 	var data model.User
 	_ = c.ShouldBindJSON(&data)
 	code := model.CheckUser(data.Username)
-	if code == errmsg.SUCCESS {
+	if code == respcode.SUCCESS {
 		model.CreateUser(&data)
 	} else {
-		code = errmsg.ErrorUsernameUsed
+		code = respcode.ErrorUsernameUsed
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"status":  code,
-		"message": errmsg.GetErrMsg(code),
+		"message": respcode.GetErrMsg(code),
+	})
+}
+
+// DeleteUser 删除用户
+func DeleteUser(c *gin.Context) {
+	id, _ := strconv.Atoi(c.Param("id"))
+	code := model.DeleteUser(id)
+	c.JSON(http.StatusOK, gin.H{
+		"status":  code,
+		"message": respcode.GetErrMsg(code),
 	})
 }

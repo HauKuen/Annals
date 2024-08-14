@@ -1,8 +1,9 @@
 package model
 
 import (
+	"errors"
 	"fmt"
-	"github.com/HauKuen/Annals/utils/errmsg"
+	"github.com/HauKuen/Annals/utils/respcode"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -42,9 +43,9 @@ func GetUser(id int) (User, int) {
 	var user User
 	err := db.Limit(1).Where("ID = ?", id).Find(&user).Error
 	if err != nil {
-		return user, errmsg.ERROR
+		return user, respcode.ERROR
 	}
-	return user, errmsg.SUCCESS
+	return user, respcode.SUCCESS
 }
 
 // GetUsers 查询用户列表
@@ -61,9 +62,9 @@ func GetUsers(pageSize int, pageNum int) ([]APIUser, int64) {
 func CreateUser(data *User) int {
 	err := db.Create(data).Error
 	if err != nil {
-		return errmsg.ERROR // 500
+		return respcode.ERROR // 500
 	}
-	return errmsg.SUCCESS
+	return respcode.SUCCESS
 }
 
 // CheckUser 查询用户是否存在
@@ -71,7 +72,27 @@ func CheckUser(username string) int {
 	var user User
 	db.Select("id").Where("username = ?", username).First(&user)
 	if user.ID > 0 {
-		return errmsg.ErrorUsernameUsed // 1001
+		return respcode.ErrorUsernameUsed // 1001
 	}
-	return errmsg.SUCCESS
+	return respcode.SUCCESS
+}
+
+// DeleteUser 删除用户
+func DeleteUser(id int) int {
+	var user User
+	// 先查询用户是否存在
+	err := db.First(&user, id).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return respcode.ErrorUserNotExist // 1003
+		}
+		return respcode.ERROR
+	}
+
+	// 用户存在，进行删除操作
+	err = db.Delete(&user).Error
+	if err != nil {
+		return respcode.ERROR
+	}
+	return respcode.SUCCESS
 }
