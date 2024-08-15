@@ -97,3 +97,62 @@ func DeleteUser(c *gin.Context) {
 		"message": respcode.GetErrMsg(code),
 	})
 }
+
+// EditUser 更新用户信息
+func EditUser(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  respcode.ERROR,
+			"message": "Invalid user ID",
+		})
+		return
+	}
+
+	var data model.User
+	if err := c.ShouldBindJSON(&data); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  respcode.ERROR,
+			"message": "Invalid input data",
+		})
+		return
+	}
+
+	// 检查用户名是否已被其他用户使用
+	if data.Username != "" {
+		code := model.CheckUser(data.Username)
+		if code == respcode.ErrorUsernameUsed {
+			c.JSON(http.StatusConflict, gin.H{
+				"status":  respcode.ErrorUsernameUsed,
+				"message": respcode.GetErrMsg(respcode.ErrorUsernameUsed),
+			})
+			return
+		}
+	}
+
+	code := model.EditUser(id, &data)
+
+	switch code {
+	case respcode.SUCCESS:
+		c.JSON(http.StatusOK, gin.H{
+			"status":  code,
+			"message": respcode.GetErrMsg(code),
+			"data":    data,
+		})
+	case respcode.ErrorUserNotExist:
+		c.JSON(http.StatusNotFound, gin.H{
+			"status":  code,
+			"message": respcode.GetErrMsg(code),
+		})
+	case respcode.ErrorUsernameUsed, respcode.ERROR:
+		c.JSON(http.StatusConflict, gin.H{
+			"status":  code,
+			"message": respcode.GetErrMsg(code),
+		})
+	default:
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  code,
+			"message": respcode.GetErrMsg(code),
+		})
+	}
+}

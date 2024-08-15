@@ -16,6 +16,7 @@ func InitRouter() {
 		r.GET("users", v1.GetUsers)
 		r.POST("user/add", v1.AddUser)
 		r.DELETE("user/delete/:id", v1.DeleteUser)
+		r.PUT("user/edit/:id", v1.EditUser)
 
 	}
 	_ = router.Run(utils.HttpPort)
