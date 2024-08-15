@@ -6,20 +6,34 @@ import (
 	"github.com/HauKuen/Annals/utils/respcode"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
+	"log"
+	"time"
 )
 
 type User struct {
 	gorm.Model
-	Username string `gorm:"unique" json:"username"`
-	Password string `gorm:"not null" json:"password"`
-	Role     int    `gorm:"not null" json:"role"`
+	Username    string     `gorm:"unique" json:"username"`
+	Password    string     `gorm:"not null" json:"password"`
+	Email       string     `gorm:"unique;not null" json:"email"`
+	Role        int        `gorm:"not null" json:"role"`
+	DisplayName string     `gorm:"not null" json:"display_name"`
+	Bio         string     `json:"bio"`
+	AvatarURL   string     `json:"avatar_url"`
+	LastLogin   *time.Time `json:"last_login"`
+	IsActive    bool       `gorm:"default:true" json:"is_active"`
 }
 
 type APIUser struct {
-	ID        uint   `json:"id"`
-	Username  string `json:"username"`
-	Role      int    `json:"role"`
-	CreatedAt string `json:"created_at"`
+	ID          uint   `json:"id"`
+	Username    string `json:"username"`
+	Email       string `json:"email"`
+	Role        int    `json:"role"`
+	DisplayName string `json:"display_name"`
+	Bio         string `json:"bio"`
+	AvatarURL   string `json:"avatar_url"`
+	CreatedAt   string `json:"created_at"`
+	LastLogin   string `json:"last_login"`
+	IsActive    bool   `json:"is_active"`
 }
 
 // BeforeCreate GORM 的钩子，在创建用户前加密密码
@@ -62,6 +76,7 @@ func GetUsers(pageSize int, pageNum int) ([]APIUser, int64) {
 func CreateUser(data *User) int {
 	err := db.Create(data).Error
 	if err != nil {
+		log.Printf("Failed to create user: %v", err)
 		return respcode.ERROR // 500
 	}
 	return respcode.SUCCESS

@@ -56,16 +56,35 @@ func CheckUser(c *gin.Context) {
 // AddUser 添加用户
 func AddUser(c *gin.Context) {
 	var data model.User
-	_ = c.ShouldBindJSON(&data)
-	code := model.CheckUser(data.Username)
-	if code == respcode.SUCCESS {
-		model.CreateUser(&data)
-	} else {
-		code = respcode.ErrorUsernameUsed
+	if err := c.ShouldBindJSON(&data); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  respcode.ERROR,
+			"message": "Invalid input data",
+		})
+		return
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"status":  code,
-		"message": respcode.GetErrMsg(code),
+
+	if code := model.CheckUser(data.Username); code != respcode.SUCCESS {
+		c.JSON(http.StatusConflict, gin.H{
+			"status":  respcode.ErrorUsernameUsed,
+			"message": respcode.GetErrMsg(respcode.ErrorUsernameUsed),
+		})
+		return
+	}
+
+	code := model.CreateUser(&data)
+	if code != respcode.SUCCESS {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  code,
+			"message": respcode.GetErrMsg(code),
+		})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"status":  respcode.SUCCESS,
+		"message": respcode.GetErrMsg(respcode.SUCCESS),
+		"data":    data,
 	})
 }
 
