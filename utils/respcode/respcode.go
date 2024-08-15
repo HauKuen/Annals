@@ -21,8 +21,9 @@ const (
 
 	ErrorArtNotExist = 2001
 
-	ErrorCatenameUsed = 3001
-	ErrorCateNotExist = 3002
+	ErrorCatenameUsed  = 3001
+	ErrorCateNotExist  = 3002
+	ErrorEmptyCatename = 3003
 )
 
 var codeMsg = map[int]string{
@@ -45,8 +46,9 @@ var codeMsg = map[int]string{
 
 	ErrorArtNotExist: "文章不存在",
 
-	ErrorCatenameUsed: "该分类已存在",
-	ErrorCateNotExist: "该分类不存在",
+	ErrorCatenameUsed:  "该分类已存在",
+	ErrorCateNotExist:  "该分类不存在",
+	ErrorEmptyCatename: "分类名称不能为空",
 }
 
 func GetErrMsg(code int) string {

@@ -18,6 +18,8 @@ func InitRouter() {
 		r.DELETE("user/delete/:id", v1.DeleteUser)
 		r.PUT("user/edit/:id", v1.EditUser)
 
+		r.POST("category/add", v1.AddCategory)
+
 	}
 	_ = router.Run(utils.HttpPort)
 }
