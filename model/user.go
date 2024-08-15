@@ -111,3 +111,54 @@ func DeleteUser(id int) int {
 	}
 	return respcode.SUCCESS
 }
+
+// EditUser 编辑用户信息
+func EditUser(id int, data *User) int {
+	var user User
+	var count int64
+
+	// 查找要编辑的用户
+	err := db.First(&user, id).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return respcode.ErrorUserNotExist
+		}
+		return respcode.ERROR
+	}
+
+	if data.Email != "" && data.Email != user.Email {
+		db.Model(&User{}).Where("email = ? AND id != ?", data.Email, id).Count(&count)
+		if count > 0 {
+			return respcode.ERROR
+		}
+	}
+
+	updates := map[string]interface{}{}
+
+	if data.Email != "" {
+		updates["email"] = data.Email
+	}
+	if data.Role != 0 {
+		updates["role"] = data.Role
+	}
+	if data.DisplayName != "" {
+		updates["display_name"] = data.DisplayName
+	}
+	if data.Bio != "" {
+		updates["bio"] = data.Bio
+	}
+	if data.AvatarURL != "" {
+		updates["avatar_url"] = data.AvatarURL
+	}
+	if data.IsActive != user.IsActive {
+		updates["is_active"] = data.IsActive
+	}
+
+	// 执行更新
+	err = db.Model(&user).Updates(updates).Error
+	if err != nil {
+		return respcode.ERROR
+	}
+
+	return respcode.SUCCESS
+}
