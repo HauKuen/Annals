@@ -129,7 +129,7 @@ func EditUser(id int, data *User) int {
 	if data.Email != "" && data.Email != user.Email {
 		db.Model(&User{}).Where("email = ? AND id != ?", data.Email, id).Count(&count)
 		if count > 0 {
-			return respcode.ERROR
+			return respcode.ErrorEmailUsed
 		}
 	}
 
