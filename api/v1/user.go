@@ -67,7 +67,7 @@ func AddUser(c *gin.Context) {
 	if code := model.CheckUser(data.Username); code != respcode.SUCCESS {
 		c.JSON(http.StatusConflict, gin.H{
 			"status":  respcode.ErrorUsernameUsed,
-			"message": respcode.GetErrMsg(respcode.ErrorUsernameUsed),
+			"message": respcode.GetErrMsg(code),
 		})
 		return
 	}
@@ -83,7 +83,7 @@ func AddUser(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, gin.H{
 		"status":  respcode.SUCCESS,
-		"message": respcode.GetErrMsg(respcode.SUCCESS),
+		"message": respcode.GetErrMsg(code),
 		"data":    data,
 	})
 }
@@ -124,7 +124,7 @@ func EditUser(c *gin.Context) {
 		if code == respcode.ErrorUsernameUsed {
 			c.JSON(http.StatusConflict, gin.H{
 				"status":  respcode.ErrorUsernameUsed,
-				"message": respcode.GetErrMsg(respcode.ErrorUsernameUsed),
+				"message": respcode.GetErrMsg(code),
 			})
 			return
 		}
