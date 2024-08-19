@@ -28,14 +28,14 @@ func InitDb() {
 	if err != nil {
 		panic("failed to connect database, err:" + err.Error())
 	}
-	err = db.AutoMigrate(&User{})
+	err = db.AutoMigrate(&User{}, &Category{})
 	if err != nil {
 		fmt.Println("auto migrate failed, err:" + err.Error())
 	}
 
 	sqlDB, _ := db.DB()
 	// 设置连接池中的最大闲置连接数。
-	sqlDB.SetMaxIdleConns(10)
+	sqlDB.SetMaxIdleConns(30)
 
 	// 设置数据库的最大连接数量。
 	sqlDB.SetMaxOpenConns(100)

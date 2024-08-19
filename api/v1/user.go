@@ -14,13 +14,14 @@ func GetUserInfo(c *gin.Context) {
 	data, code := model.GetUser(id)
 	maps["username"] = data.Username
 	maps["role"] = data.Role
-	c.JSON(
-		http.StatusOK, gin.H{
-			"status":  code,
-			"data":    maps,
-			"message": respcode.GetErrMsg(code),
-		},
-	)
+	response := gin.H{
+		"status":  code,
+		"message": respcode.GetErrMsg(code),
+	}
+	if code == respcode.SUCCESS {
+		response["data"] = maps
+	}
+	c.JSON(http.StatusOK, response)
 }
 
 func GetUsers(c *gin.Context) {
@@ -43,19 +44,11 @@ func GetUsers(c *gin.Context) {
 	})
 }
 
-// CheckUser 用户是否存在
-func CheckUser(c *gin.Context) {
-	username := c.Query("username")
-	code := model.CheckUser(username)
-	c.JSON(http.StatusOK, gin.H{
-		"status":  code,
-		"message": respcode.GetErrMsg(code),
-	})
-}
-
 // AddUser 添加用户
 func AddUser(c *gin.Context) {
 	var data model.User
+
+	// 绑定 JSON 数据并检查错误
 	if err := c.ShouldBindJSON(&data); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status":  respcode.ERROR,
@@ -64,16 +57,8 @@ func AddUser(c *gin.Context) {
 		return
 	}
 
-	if code := model.CheckUser(data.Username); code != respcode.SUCCESS {
-		c.JSON(http.StatusConflict, gin.H{
-			"status":  respcode.ErrorUsernameUsed,
-			"message": respcode.GetErrMsg(code),
-		})
-		return
-	}
-
-	code := model.CreateUser(&data)
-	if code != respcode.SUCCESS {
+	// 创建用户
+	if code := model.CreateUser(&data); code != respcode.SUCCESS {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  code,
 			"message": respcode.GetErrMsg(code),
@@ -83,7 +68,7 @@ func AddUser(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, gin.H{
 		"status":  respcode.SUCCESS,
-		"message": respcode.GetErrMsg(code),
+		"message": respcode.GetErrMsg(respcode.SUCCESS),
 		"data":    data,
 	})
 }

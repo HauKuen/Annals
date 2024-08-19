@@ -7,16 +7,17 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"log"
+	"strings"
 	"time"
 )
 
 type User struct {
 	gorm.Model
-	Username    string     `gorm:"unique" json:"username"`
+	Username    string     `gorm:"unique;not null" json:"username"`
 	Password    string     `gorm:"not null" json:"password"`
 	Email       string     `gorm:"unique;not null" json:"email"`
 	Role        int        `gorm:"not null" json:"role"`
-	DisplayName string     `gorm:"not null" json:"display_name"`
+	DisplayName string     `json:"display_name"`
 	Bio         string     `json:"bio"`
 	AvatarURL   string     `json:"avatar_url"`
 	LastLogin   *time.Time `json:"last_login"`
@@ -55,10 +56,14 @@ func (u *User) VerifyPassword(password string) bool {
 // GetUser 查询用户
 func GetUser(id int) (User, int) {
 	var user User
-	err := db.Limit(1).Where("ID = ?", id).Find(&user).Error
-	if err != nil {
+	err := db.First(&user, id).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return user, respcode.ErrorUserNotExist // 1003
+	} else if err != nil {
 		return user, respcode.ERROR
 	}
+
 	return user, respcode.SUCCESS
 }
 
@@ -76,6 +81,16 @@ func GetUsers(pageSize int, pageNum int) ([]APIUser, int64) {
 func CreateUser(data *User) int {
 	err := db.Create(data).Error
 	if err != nil {
+		// 检查 MySQL 错误代码 1062（重复键错误）
+		if strings.Contains(err.Error(), "Error 1062") {
+			// 判断是哪个字段导致了重复错误
+			if strings.Contains(err.Error(), "user.uni_user_username") {
+				return respcode.ErrorUsernameUsed
+			}
+			if strings.Contains(err.Error(), "user.uni_user_email") {
+				return respcode.ErrorEmailUsed
+			}
+		}
 		log.Printf("Failed to create user: %v", err)
 		return respcode.ERROR // 500
 	}

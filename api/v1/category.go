@@ -5,6 +5,7 @@ import (
 	"github.com/HauKuen/Annals/utils/respcode"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
 // AddCategory 添加分类
@@ -33,8 +34,8 @@ func AddCategory(c *gin.Context) {
 	code := model.CheckCategory(data.Name)
 	if code == respcode.SUCCESS {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"status":  respcode.ERROR,
-			"message": respcode.GetErrMsg(code),
+			"status":  respcode.ErrorCatenameUsed,
+			"message": respcode.GetErrMsg(respcode.ErrorCatenameUsed),
 		})
 		return
 	}
@@ -42,15 +43,32 @@ func AddCategory(c *gin.Context) {
 	// 创建新分类
 	code = model.CreateCategory(&data)
 
-	if code == respcode.SUCCESS {
-		c.JSON(http.StatusOK, gin.H{
-			"status":  code,
-			"message": respcode.GetErrMsg(code),
-		})
-	} else {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status":  code,
-			"message": respcode.GetErrMsg(code),
-		})
+	c.JSON(http.StatusOK, gin.H{
+		"status":  code,
+		"message": respcode.GetErrMsg(code),
+	})
+}
+
+// DeleteCategory 删除分类
+func DeleteCategory(c *gin.Context) {
+	id, _ := strconv.Atoi(c.Param("id"))
+	code := model.DeleteCategory(id)
+	c.JSON(http.StatusOK, gin.H{
+		"status":  code,
+		"message": respcode.GetErrMsg(code),
+	})
+}
+
+// GetCategory 获取分类
+func GetCategory(c *gin.Context) {
+	id, _ := strconv.Atoi(c.Param("id"))
+	data, code := model.GetCategory(id)
+	response := gin.H{
+		"status":  code,
+		"message": respcode.GetErrMsg(code),
 	}
+	if code == respcode.SUCCESS {
+		response["data"] = data
+	}
+	c.JSON(http.StatusOK, response)
 }
