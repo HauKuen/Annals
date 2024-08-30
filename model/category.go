@@ -3,11 +3,12 @@ package model
 import (
 	"fmt"
 	"github.com/HauKuen/Annals/utils/respcode"
+	"gorm.io/gorm"
 )
 
 type Category struct {
-	ID   uint   `gorm:"primary_key;auto_increment" json:"id"`
-	Name string `gorm:"type:varchar(100);uniqueIndex;not null" json:"name"`
+	gorm.Model
+	Name string `gorm:"type:varchar(100);uniqueIndex;not null" json:"name" validate:"required"`
 }
 
 // CreateCategory 创建分类

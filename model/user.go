@@ -13,10 +13,10 @@ import (
 
 type User struct {
 	gorm.Model
-	Username    string     `gorm:"unique;not null" json:"username"`
-	Password    string     `gorm:"not null" json:"password"`
-	Email       string     `gorm:"unique;not null" json:"email"`
-	Role        int        `gorm:"not null" json:"role"`
+	Username    string     `gorm:"unique;not null" json:"username" validate:"required"`
+	Password    string     `gorm:"not null" json:"password" validate:"required"`
+	Email       string     `gorm:"unique;not null" json:"email" validate:"required,email"`
+	Role        int        `gorm:"not null" json:"role" validate:"required"`
 	DisplayName string     `json:"display_name"`
 	Bio         string     `json:"bio"`
 	AvatarURL   string     `json:"avatar_url"`
