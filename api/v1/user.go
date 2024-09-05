@@ -9,18 +9,36 @@ import (
 )
 
 func GetUserInfo(c *gin.Context) {
-	id, _ := strconv.Atoi(c.Param("id"))
-	var maps = make(map[string]interface{})
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  respcode.ERROR,
+			"message": "Invalid user ID",
+		})
+		return
+	}
+
 	data, code := model.GetUser(id)
-	maps["username"] = data.Username
-	maps["role"] = data.Role
 	response := gin.H{
 		"status":  code,
 		"message": respcode.GetErrMsg(code),
 	}
+
 	if code == respcode.SUCCESS {
-		response["data"] = maps
+		response["data"] = gin.H{
+			"id":           data.ID,
+			"username":     data.Username,
+			"email":        data.Email,
+			"role":         data.Role,
+			"display_name": data.DisplayName,
+			"bio":          data.Bio,
+			"avatar_url":   data.AvatarURL,
+			"created_at":   data.CreatedAt,
+			"last_login":   data.LastLogin,
+			"is_active":    data.IsActive,
+		}
 	}
+
 	c.JSON(http.StatusOK, response)
 }
 
