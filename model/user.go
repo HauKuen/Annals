@@ -62,10 +62,10 @@ func GetUser(id int) (APIUser, int) {
 	result := db.Model(&User{}).First(&apiUser, id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			utils.Log.Error("User not found", err)
+			utils.Log.Error("User not found", id)
 			return apiUser, respcode.ErrorUserNotExist
 		}
-		utils.Log.Error("Failed to get user:", err)
+		utils.Log.Error("Failed to get user:", id)
 		return apiUser, respcode.ERROR
 	}
 

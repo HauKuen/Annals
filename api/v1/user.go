@@ -21,6 +21,7 @@ func GetUserInfo(c *gin.Context) {
 	data, code := model.GetUser(id)
 	response := gin.H{
 		"status":  code,
+		"data":    data,
 		"message": respcode.GetErrMsg(code),
 	}
 

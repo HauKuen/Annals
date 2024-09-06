@@ -56,8 +56,10 @@ func validateConfig() error {
 			missingConfigs = append(missingConfigs, name)
 		}
 	}
-
+	InitLogger()
 	if len(missingConfigs) > 0 {
+		InitLogger()
+		Log.Error("Missing required configurations", missingConfigs)
 		return fmt.Errorf("missing required configurations: %v", missingConfigs)
 	}
 
