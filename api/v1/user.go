@@ -9,15 +9,24 @@ import (
 )
 
 func GetUserInfo(c *gin.Context) {
-	id, _ := strconv.Atoi(c.Param("id"))
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  respcode.ERROR,
+			"message": "Invalid user ID",
+		})
+		return
+	}
+
 	data, code := model.GetUser(id)
 	response := gin.H{
 		"status":  code,
 		"message": respcode.GetErrMsg(code),
 	}
+
 	if code == respcode.SUCCESS {
-		response["data"] = data
 	}
+
 	c.JSON(http.StatusOK, response)
 }
 

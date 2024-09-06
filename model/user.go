@@ -38,7 +38,7 @@ type APIUser struct {
 	IsActive    bool   `json:"is_active"`
 }
 
-// BeforeCreate GORM 的钩子，在创建用户前加密密码
+// BeforeCreate 在创建用户前加密密码
 func (u *User) BeforeCreate(tx *gorm.DB) error {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 	if err != nil {
@@ -155,29 +155,28 @@ func EditUser(id int, data *User) int {
 		}
 	}
 
-	updates := map[string]interface{}{}
-
+	var updateFields []string
 	if data.Email != "" {
-		updates["email"] = data.Email
+		updateFields = append(updateFields, "email")
 	}
 	if data.Role != 0 {
-		updates["role"] = data.Role
+		updateFields = append(updateFields, "role")
 	}
 	if data.DisplayName != "" {
-		updates["display_name"] = data.DisplayName
+		updateFields = append(updateFields, "display_name")
 	}
 	if data.Bio != "" {
-		updates["bio"] = data.Bio
+		updateFields = append(updateFields, "bio")
 	}
 	if data.AvatarURL != "" {
-		updates["avatar_url"] = data.AvatarURL
+		updateFields = append(updateFields, "avatar_url")
 	}
 	if data.IsActive != user.IsActive {
-		updates["is_active"] = data.IsActive
+		updateFields = append(updateFields, "is_active")
 	}
 
 	// 执行更新
-	err = db.Model(&user).Updates(updates).Error
+	err = db.Model(&user).Select(updateFields).Updates(data).Error
 	if err != nil {
 		return respcode.ERROR
 	}

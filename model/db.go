@@ -11,9 +11,9 @@ import (
 )
 
 var db *gorm.DB
-var err error
 
 func InitDb() {
+	var err error
 	dns := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		utils.User, utils.Password, utils.Host, utils.Port, utils.Dbname)
 	db, err = gorm.Open(mysql.Open(dns), &gorm.Config{
@@ -32,7 +32,8 @@ func InitDb() {
 	}
 
 	sqlDB, _ := db.DB()
-	sqlDB.SetMaxIdleConns(30)
+
+	sqlDB.SetMaxIdleConns(10)
 	sqlDB.SetMaxOpenConns(100)
 	sqlDB.SetConnMaxLifetime(10 * time.Second)
 
