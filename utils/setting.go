@@ -34,4 +34,8 @@ func init() {
 	User = viper.GetString("mysql.user")
 	Password = viper.GetString("mysql.password")
 	Dbname = viper.GetString("mysql.db_name")
+
+	InitLogger()
+
+	Log.Info("Configuration loaded successfully")
 }

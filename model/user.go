@@ -3,6 +3,7 @@ package model
 import (
 	"errors"
 	"fmt"
+	"github.com/HauKuen/Annals/utils"
 	"github.com/HauKuen/Annals/utils/respcode"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -41,6 +42,7 @@ type APIUser struct {
 func (u *User) BeforeCreate(tx *gorm.DB) error {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 	if err != nil {
+		utils.Log.Error("Failed to hash password:", err)
 		return fmt.Errorf("failed to hash password: %w", err)
 	}
 	u.Password = string(hashedPassword)
@@ -60,9 +62,10 @@ func GetUser(id int) (APIUser, int) {
 	result := db.Model(&User{}).First(&apiUser, id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			utils.Log.Error("User not found", err)
 			return apiUser, respcode.ErrorUserNotExist
 		}
-		log.Printf("Error retrieving user: %v", result.Error)
+		utils.Log.Error("Failed to get user:", err)
 		return apiUser, respcode.ERROR
 	}
 
@@ -104,6 +107,8 @@ func CheckUser(username string) int {
 	var user User
 	db.Select("id").Where("username = ?", username).First(&user)
 	if user.ID > 0 {
+		message := fmt.Sprintf("User %s already exists", user.Username)
+		utils.Log.Error(message)
 		return respcode.ErrorUsernameUsed // 1001
 	}
 	return respcode.SUCCESS
