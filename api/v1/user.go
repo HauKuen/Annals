@@ -10,16 +10,13 @@ import (
 
 func GetUserInfo(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
-	var maps = make(map[string]interface{})
 	data, code := model.GetUser(id)
-	maps["username"] = data.Username
-	maps["role"] = data.Role
 	response := gin.H{
 		"status":  code,
 		"message": respcode.GetErrMsg(code),
 	}
 	if code == respcode.SUCCESS {
-		response["data"] = maps
+		response["data"] = data
 	}
 	c.JSON(http.StatusOK, response)
 }

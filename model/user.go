@@ -54,17 +54,19 @@ func (u *User) VerifyPassword(password string) bool {
 }
 
 // GetUser 查询用户
-func GetUser(id int) (User, int) {
-	var user User
-	err := db.First(&user, id).Error
+func GetUser(id int) (APIUser, int) {
+	var apiUser APIUser
 
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return user, respcode.ErrorUserNotExist // 1003
-	} else if err != nil {
-		return user, respcode.ERROR
+	result := db.Model(&User{}).First(&apiUser, id)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return apiUser, respcode.ErrorUserNotExist
+		}
+		log.Printf("Error retrieving user: %v", result.Error)
+		return apiUser, respcode.ERROR
 	}
 
-	return user, respcode.SUCCESS
+	return apiUser, respcode.SUCCESS
 }
 
 // GetUsers 查询用户列表
