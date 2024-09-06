@@ -25,18 +25,6 @@ func GetUserInfo(c *gin.Context) {
 	}
 
 	if code == respcode.SUCCESS {
-		response["data"] = gin.H{
-			"id":           data.ID,
-			"username":     data.Username,
-			"email":        data.Email,
-			"role":         data.Role,
-			"display_name": data.DisplayName,
-			"bio":          data.Bio,
-			"avatar_url":   data.AvatarURL,
-			"created_at":   data.CreatedAt,
-			"last_login":   data.LastLogin,
-			"is_active":    data.IsActive,
-		}
 	}
 
 	c.JSON(http.StatusOK, response)

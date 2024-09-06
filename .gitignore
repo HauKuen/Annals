@@ -26,3 +26,4 @@ go.work.sum
 /config/config.toml
 
 .idea/
+logs/
