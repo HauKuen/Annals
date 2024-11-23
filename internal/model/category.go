@@ -2,7 +2,8 @@ package model
 
 import (
 	"fmt"
-	"github.com/HauKuen/Annals/utils/respcode"
+
+	"github.com/HauKuen/Annals/internal/utils/respcode"
 	"gorm.io/gorm"
 )
 

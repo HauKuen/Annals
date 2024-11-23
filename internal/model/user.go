@@ -3,13 +3,14 @@ package model
 import (
 	"errors"
 	"fmt"
-	"github.com/HauKuen/Annals/utils"
-	"github.com/HauKuen/Annals/utils/respcode"
-	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 	"log"
 	"strings"
 	"time"
+
+	"github.com/HauKuen/Annals/internal/utils"
+	"github.com/HauKuen/Annals/internal/utils/respcode"
+	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 type User struct {

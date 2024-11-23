@@ -2,12 +2,14 @@ package model
 
 import (
 	"fmt"
-	"github.com/HauKuen/Annals/utils"
+
+	"time"
+
+	"github.com/HauKuen/Annals/internal/utils"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
-	"time"
 )
 
 var db *gorm.DB

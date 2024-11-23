@@ -1,14 +1,16 @@
 package routes
 
 import (
-	"github.com/HauKuen/Annals/api/v1"
-	"github.com/HauKuen/Annals/utils"
+	v1 "github.com/HauKuen/Annals/internal/api/v1"
+	"github.com/HauKuen/Annals/internal/utils"
 	"github.com/gin-gonic/gin"
 )
 
 func InitRouter() {
 	gin.SetMode(utils.AppMode)
 	router := gin.Default()
+
+	router.Use(utils.LoggerMiddleware())
 
 	r := router.Group("/api/v1")
 	{
@@ -21,7 +23,6 @@ func InitRouter() {
 		r.POST("category/add", v1.AddCategory)
 		r.GET("category/:id", v1.GetCategory)
 		r.DELETE("category/delete/:id", v1.DeleteCategory)
-
 	}
 	_ = router.Run(utils.HttpPort)
 }

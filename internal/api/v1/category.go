@@ -1,11 +1,12 @@
 package v1
 
 import (
-	"github.com/HauKuen/Annals/model"
-	"github.com/HauKuen/Annals/utils/respcode"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+
+	"github.com/HauKuen/Annals/internal/model"
+	"github.com/HauKuen/Annals/internal/utils/respcode"
+	"github.com/gin-gonic/gin"
 )
 
 // AddCategory 添加分类
