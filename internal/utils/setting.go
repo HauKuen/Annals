@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+
 	"github.com/spf13/viper"
 )
 
@@ -10,11 +11,15 @@ var (
 	HttpPort string
 	JwtKey   string
 
-	Host     string
-	Port     string
-	User     string
-	Password string
-	Dbname   string
+	Host              string
+	Port              string
+	User              string
+	Password          string
+	Dbname            string
+	DbMaxIdleConns    int
+	DbMaxOpenConns    int
+	DbConnMaxLifetime int
+	DbEnableSqlLog    bool
 )
 
 func LoadConfig() error {
@@ -34,6 +39,10 @@ func LoadConfig() error {
 	User = viper.GetString("mysql.user")
 	Password = viper.GetString("mysql.password")
 	Dbname = viper.GetString("mysql.db_name")
+	DbMaxIdleConns = viper.GetInt("mysql.max_idle_conns")
+	DbMaxOpenConns = viper.GetInt("mysql.max_open_conns")
+	DbConnMaxLifetime = viper.GetInt("mysql.conn_max_lifetime")
+	DbEnableSqlLog = viper.GetBool("mysql.enable_sql_log")
 
 	return validateConfig()
 }

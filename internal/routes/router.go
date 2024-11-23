@@ -8,8 +8,9 @@ import (
 
 func InitRouter() {
 	gin.SetMode(utils.AppMode)
-	router := gin.Default()
+	router := gin.New()
 
+	router.Use(gin.Recovery())
 	router.Use(utils.LoggerMiddleware())
 
 	r := router.Group("/api/v1")
@@ -24,5 +25,8 @@ func InitRouter() {
 		r.GET("category/:id", v1.GetCategory)
 		r.DELETE("category/delete/:id", v1.DeleteCategory)
 	}
-	_ = router.Run(utils.HttpPort)
+
+	if err := router.Run(utils.HttpPort); err != nil {
+		utils.Log.Fatal("服务器启动失败:", err)
+	}
 }

@@ -13,3 +13,7 @@ port = 3306
 user = "user"
 password = "password"
 db_name = "dbname"
+max_idle_conns = 10
+max_open_conns = 100
+conn_max_lifetime = 10  # 秒
+enable_sql_log = false  # 是否启用 SQL 日志
