@@ -34,6 +34,17 @@ func InitRouter() {
 			auth.POST("category/add", v1.AddCategory)
 			auth.GET("category/:id", v1.GetCategory)
 			auth.DELETE("category/delete/:id", v1.DeleteCategory)
+			auth.GET("categories", v1.GetCategories)
+
+			// 文章相关接口
+			auth.GET("articles", v1.GetArticles)
+			auth.GET("article/:id", v1.GetArticle)
+			auth.POST("article/add", v1.AddArticle)
+			auth.PUT("article/edit/:id", v1.EditArticle)
+			auth.DELETE("article/delete/:id", v1.DeleteArticle)
+			auth.GET("category/:id/articles", v1.GetCategoryArticles)
+			auth.GET("user/:id/articles", v1.GetUserArticles)
+			auth.GET("articles/search", v1.SearchArticles)
 		}
 	}
 

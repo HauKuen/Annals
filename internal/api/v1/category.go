@@ -73,3 +73,16 @@ func GetCategory(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, response)
 }
+
+// GetCategories 获取所有分类
+func GetCategories(c *gin.Context) {
+	data, code := model.GetCategories()
+	response := gin.H{
+		"status":  code,
+		"message": respcode.GetErrMsg(code),
+	}
+	if code == respcode.SUCCESS {
+		response["data"] = data
+	}
+	c.JSON(http.StatusOK, response)
+}

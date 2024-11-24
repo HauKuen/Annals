@@ -52,3 +52,14 @@ func GetCategory(id int) (Category, int) {
 	}
 	return category, respcode.SUCCESS
 }
+
+// GetCategories 获取所有分类
+func GetCategories() ([]Category, int) {
+	var categories []Category
+
+	if err := db.Find(&categories).Error; err != nil {
+		return nil, respcode.ERROR
+	}
+
+	return categories, respcode.SUCCESS
+}
