@@ -39,6 +39,11 @@ type APIUser struct {
 	IsActive    bool   `json:"is_active"`
 }
 
+type LoginRequest struct {
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
 // BeforeCreate 在创建用户前加密密码
 func (u *User) BeforeCreate(tx *gorm.DB) error {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
@@ -183,4 +188,29 @@ func EditUser(id int, data *User) int {
 	}
 
 	return respcode.SUCCESS
+}
+
+// GetUserByUsername 通过用户名获取用户信息
+func GetUserByUsername(username string) (*User, int) {
+	var user User
+	err := db.Where("username = ?", username).First(&user).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, respcode.ErrorUserNotExist
+		}
+		return nil, respcode.ERROR
+	}
+	return &user, respcode.SUCCESS
+}
+
+// BeforeSave GORM 钩子：保存前加密密码
+func (u *User) BeforeSave(tx *gorm.DB) error {
+	if u.Password != "" {
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
+		if err != nil {
+			return err
+		}
+		u.Password = string(hashedPassword)
+	}
+	return nil
 }
