@@ -13,8 +13,8 @@ func GetUserInfo(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"status":  respcode.ERROR,
-			"message": "Invalid user ID",
+			"status":  respcode.BadRequest,
+			"message": respcode.GetErrMsg(respcode.BadRequest),
 		})
 		return
 	}
@@ -59,8 +59,8 @@ func AddUser(c *gin.Context) {
 	// 绑定 JSON 数据并检查错误
 	if err := c.ShouldBindJSON(&data); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"status":  respcode.ERROR,
-			"message": "Invalid input data",
+			"status":  respcode.BadRequest,
+			"message": respcode.GetErrMsg(respcode.BadRequest),
 		})
 		return
 	}
@@ -96,8 +96,8 @@ func EditUser(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"status":  respcode.ERROR,
-			"message": "Invalid user ID",
+			"status":  respcode.BadRequest,
+			"message": respcode.GetErrMsg(respcode.BadRequest),
 		})
 		return
 	}

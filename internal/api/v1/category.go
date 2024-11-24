@@ -16,8 +16,8 @@ func AddCategory(c *gin.Context) {
 	// 绑定 JSON 数据到结构体
 	if err := c.ShouldBindJSON(&data); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"status":  respcode.ERROR,
-			"message": "无效的数据格式",
+			"status":  respcode.BadRequest,
+			"message": respcode.GetErrMsg(respcode.BadRequest),
 		})
 		return
 	}
@@ -25,8 +25,8 @@ func AddCategory(c *gin.Context) {
 	// 检查分类名是否为空
 	if data.Name == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"status":  respcode.ErrorEmptyCatename,
-			"message": respcode.GetErrMsg(respcode.ErrorEmptyCatename),
+			"status":  respcode.ErrorEmptyCateName,
+			"message": respcode.GetErrMsg(respcode.ErrorEmptyCateName),
 		})
 		return
 	}
@@ -35,8 +35,8 @@ func AddCategory(c *gin.Context) {
 	code := model.CheckCategory(data.Name)
 	if code == respcode.SUCCESS {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"status":  respcode.ErrorCatenameUsed,
-			"message": respcode.GetErrMsg(respcode.ErrorCatenameUsed),
+			"status":  respcode.ErrorCateNameUsed,
+			"message": respcode.GetErrMsg(respcode.ErrorCateNameUsed),
 		})
 		return
 	}
