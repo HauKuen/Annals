@@ -63,7 +63,7 @@ func autoMigrate() error {
 		return nil
 	}
 
-	if err := db.AutoMigrate(&User{}, &Category{}); err != nil {
+	if err := db.AutoMigrate(&User{}, &Category{}, &Article{}); err != nil {
 		return err
 	}
 

@@ -46,6 +46,8 @@ func GetArticle(c *gin.Context) {
 // AddArticle 添加文章
 func AddArticle(c *gin.Context) {
 	var article model.Article
+
+	// 绑定请求数据
 	if err := c.ShouldBindJSON(&article); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status":  respcode.BadRequest,
@@ -54,23 +56,30 @@ func AddArticle(c *gin.Context) {
 		return
 	}
 
-	// 设置当前用户ID
-	userID, exists := c.Get("user_id")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"status":  respcode.Unauthorized,
-			"message": respcode.GetErrMsg(respcode.Unauthorized),
-		})
-		return
-	}
-	article.UserID = userID.(uint)
+	// 从 JWT 中获取用户ID
+	userID := c.GetUint("user_id")
+	article.UserID = userID
 
+	// 创建文章
 	code := model.CreateArticle(&article)
-	c.JSON(http.StatusOK, gin.H{
-		"status":  code,
-		"message": respcode.GetErrMsg(code),
-		"data":    article,
-	})
+
+	// 返回结果
+	if code == respcode.SUCCESS {
+		c.JSON(http.StatusCreated, gin.H{
+			"status":  code,
+			"message": respcode.GetErrMsg(code),
+			"data":    article,
+		})
+	} else {
+		httpStatus := http.StatusBadRequest
+		if code == respcode.ERROR {
+			httpStatus = http.StatusInternalServerError
+		}
+		c.JSON(httpStatus, gin.H{
+			"status":  code,
+			"message": respcode.GetErrMsg(code),
+		})
+	}
 }
 
 // EditArticle 更新文章

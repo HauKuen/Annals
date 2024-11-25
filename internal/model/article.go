@@ -1,18 +1,22 @@
 package model
 
 import (
+	"github.com/HauKuen/Annals/internal/utils"
 	"github.com/HauKuen/Annals/internal/utils/respcode"
 	"gorm.io/gorm"
 )
 
 type Article struct {
 	gorm.Model
-	Title      string   `gorm:"type:varchar(100);not null" json:"title"`
-	Content    string   `gorm:"type:longtext;not null" json:"content"`
-	CategoryID uint     `gorm:"not null" json:"category_id"`
-	UserID     uint     `gorm:"not null" json:"user_id"`
-	Category   Category `gorm:"foreignKey:CategoryID" json:"category"`
-	User       User     `gorm:"foreignKey:UserID" json:"user"`
+	Title      string `gorm:"type:varchar(100);not null" json:"title"`
+	Content    string `gorm:"type:longtext;not null" json:"content"`
+	Img        string `gorm:"type:varchar(200)" json:"img"`
+	CategoryID uint   `gorm:"not null" json:"category_id"`
+	UserID     uint   `gorm:"not null" json:"user_id"`
+
+	// 关联
+	Category Category `gorm:"foreignKey:CategoryID" json:"category"`
+	User     User     `gorm:"foreignKey:UserID" json:"user"`
 }
 
 // GetArticles 获取文章列表
@@ -45,9 +49,12 @@ func GetArticleByID(id int) (Article, int) {
 
 // CreateArticle 创建文章
 func CreateArticle(article *Article) int {
+	// 检查标题是否为空
 	if article.Title == "" {
 		return respcode.ErrorArtTitleEmpty
 	}
+
+	// 检查内容是否为空
 	if article.Content == "" {
 		return respcode.ErrorArtContent
 	}
@@ -58,10 +65,18 @@ func CreateArticle(article *Article) int {
 		return respcode.ErrorCateNotExist
 	}
 
-	err := db.Create(article).Error
-	if err != nil {
+	// 创建文章
+	if err := db.Create(article).Error; err != nil {
+		utils.Log.Error("创建文章失败:", err)
 		return respcode.ERROR
 	}
+
+	// 加载关联的分类和用户信息
+	if err := db.Preload("Category").Preload("User").First(article, article.ID).Error; err != nil {
+		utils.Log.Error("加载文章关联信息失败:", err)
+		return respcode.ERROR
+	}
+
 	return respcode.SUCCESS
 }
 
