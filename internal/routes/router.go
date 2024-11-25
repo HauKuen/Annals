@@ -1,6 +1,8 @@
 package routes
 
 import (
+	"net/http"
+
 	v1 "github.com/HauKuen/Annals/internal/api/v1"
 	"github.com/HauKuen/Annals/internal/middleware"
 	"github.com/HauKuen/Annals/internal/utils"
@@ -11,6 +13,8 @@ func InitRouter() {
 	gin.SetMode(utils.AppMode)
 	router := gin.New()
 
+	// 添加 CORS 中间件
+	router.Use(cors())
 	router.Use(gin.Recovery())
 	router.Use(utils.LoggerMiddleware())
 
@@ -50,5 +54,22 @@ func InitRouter() {
 
 	if err := router.Run(utils.HttpPort); err != nil {
 		utils.Log.Fatal("服务器启动失败:", err)
+	}
+}
+
+// CORS 中间件
+func cors() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, DELETE")
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(http.StatusNoContent)
+			return
+		}
+
+		c.Next()
 	}
 }
