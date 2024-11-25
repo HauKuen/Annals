@@ -21,10 +21,14 @@ func InitRouter() {
 	r := router.Group("/api/v1")
 	{
 		// 公开接口
-		r.POST("auth/login", v1.Login)
+		auth := r.Group("/auth")
+		{
+			auth.POST("login", v1.Login)
+			auth.GET("validate", v1.ValidateToken)
+		}
 
 		// 需要认证的接口
-		auth := r.Group("/")
+		auth = r.Group("/")
 		auth.Use(middleware.JWTAuth())
 		{
 			// 用户相关接口
