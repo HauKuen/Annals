@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"github.com/HauKuen/Annals/internal/utils/respcode"
 	"net/http"
 
 	v1 "github.com/HauKuen/Annals/internal/api/v1"
@@ -13,7 +14,6 @@ func InitRouter() {
 	gin.SetMode(utils.AppMode)
 	router := gin.New()
 
-	// 添加 CORS 中间件
 	router.Use(cors())
 	router.Use(gin.Recovery())
 	router.Use(utils.LoggerMiddleware())
@@ -33,9 +33,9 @@ func InitRouter() {
 		{
 			// 用户相关接口
 			auth.GET("user/:id", v1.GetUserInfo)
-			auth.GET("users", v1.GetUsers)
-			auth.POST("user/add", v1.AddUser)
-			auth.DELETE("user/delete/:id", v1.DeleteUser)
+			auth.GET("users", AdminRequired(), v1.GetUsers)
+			auth.POST("user/add", AdminRequired(), v1.AddUser)
+			auth.DELETE("user/delete/:id", AdminRequired(), v1.DeleteUser)
 			auth.PUT("user/edit/:id", v1.EditUser)
 
 			// 分类相关接口
@@ -74,6 +74,21 @@ func cors() gin.HandlerFunc {
 			return
 		}
 
+		c.Next()
+	}
+}
+
+func AdminRequired() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		role := c.GetInt("role")
+		if role == 0 {
+			c.JSON(http.StatusForbidden, gin.H{
+				"status":  respcode.ErrorNoPermission,
+				"message": respcode.GetErrMsg(respcode.ErrorNoPermission),
+			})
+			c.Abort()
+			return
+		}
 		c.Next()
 	}
 }

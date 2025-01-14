@@ -9,8 +9,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// GetUserInfo 查询用户信息
 func GetUserInfo(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
+	// 获取当前用户ID和角色
+	currentUserID := c.GetUint("user_id")
+	currentUserRole := c.GetInt("role")
+
+	requestedID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status":  respcode.BadRequest,
@@ -19,7 +24,16 @@ func GetUserInfo(c *gin.Context) {
 		return
 	}
 
-	data, code := model.GetUser(id)
+	// 只允许管理员或用户本人查看信息
+	if currentUserRole == 0 && uint(requestedID) != currentUserID {
+		c.JSON(http.StatusForbidden, gin.H{
+			"status":  respcode.ErrorNoPermission,
+			"message": respcode.GetErrMsg(respcode.ErrorNoPermission),
+		})
+		return
+	}
+
+	data, code := model.GetUser(requestedID)
 	response := gin.H{
 		"status":  code,
 		"data":    data,
@@ -93,11 +107,23 @@ func DeleteUser(c *gin.Context) {
 
 // EditUser 更新用户信息
 func EditUser(c *gin.Context) {
+	currentUserID := c.GetUint("user_id")
+	currentUserRole := c.GetInt("role")
+
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status":  respcode.BadRequest,
 			"message": respcode.GetErrMsg(respcode.BadRequest),
+		})
+		return
+	}
+
+	// 只允许管理员或用户本人修改信息
+	if currentUserRole == 0 && uint(id) != currentUserID {
+		c.JSON(http.StatusForbidden, gin.H{
+			"status":  respcode.ErrorNoPermission,
+			"message": respcode.GetErrMsg(respcode.ErrorNoPermission),
 		})
 		return
 	}

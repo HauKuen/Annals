@@ -48,7 +48,7 @@ func InitDb() error {
 
 	sqlDB.SetMaxIdleConns(utils.DbMaxIdleConns)
 	sqlDB.SetMaxOpenConns(utils.DbMaxOpenConns)
-	sqlDB.SetConnMaxLifetime(time.Duration(utils.DbConnMaxLifetime) * time.Second)
+	sqlDB.SetConnMaxLifetime(time.Duration(utils.DbConnMaxLifetime) * time.Minute)
 
 	if err := autoMigrate(); err != nil {
 		return fmt.Errorf("数据库迁移失败: %w", err)

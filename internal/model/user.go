@@ -202,15 +202,3 @@ func GetUserByUsername(username string) (*User, int) {
 	}
 	return &user, respcode.SUCCESS
 }
-
-// BeforeSave GORM 钩子：保存前加密密码
-func (u *User) BeforeSave(tx *gorm.DB) error {
-	if u.Password != "" {
-		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
-		if err != nil {
-			return err
-		}
-		u.Password = string(hashedPassword)
-	}
-	return nil
-}
