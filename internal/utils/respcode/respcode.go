@@ -38,6 +38,8 @@ const (
 	ErrorArtNotExist   = 4001
 	ErrorArtTitleEmpty = 4002
 	ErrorArtContent    = 4003
+
+	ErrorPasswordTooShort = 1010
 )
 
 var codeMsg = map[int]string{
@@ -69,6 +71,7 @@ var codeMsg = map[int]string{
 	ErrorArtNotExist:      "文章不存在",
 	ErrorArtTitleEmpty:    "文章标题不能为空",
 	ErrorArtContent:       "文章内容不能为空",
+	ErrorPasswordTooShort: "密码长度太短",
 }
 
 func GetErrMsg(code int) string {

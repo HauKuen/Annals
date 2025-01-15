@@ -202,3 +202,48 @@ func GetUserByUsername(username string) (*User, int) {
 	}
 	return &user, respcode.SUCCESS
 }
+
+// ChangeUserPassword 修改用户密码
+func ChangeUserPassword(userID uint, oldPassword, newPassword string, isAdmin bool) int {
+	var user User
+
+	// 查找用户
+	err := db.First(&user, userID).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return respcode.ErrorUserNotExist
+		}
+		return respcode.ERROR
+	}
+
+	// 如果不是管理员，必须验证旧密码
+	if !isAdmin {
+		if oldPassword == "" {
+			return respcode.ErrorPasswordWrong // TODO 定义一个新的错误码：ErrorOldPasswordRequired
+		}
+		if !user.VerifyPassword(oldPassword) {
+			return respcode.ErrorPasswordWrong
+		}
+	}
+
+	// 验证新密码长度
+	if len(newPassword) < 6 {
+		return respcode.ErrorPasswordTooShort
+	}
+
+	// 生成新密码的哈希值
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		utils.Log.Error("Failed to hash new password:", err)
+		return respcode.ERROR
+	}
+
+	// 更新密码
+	err = db.Model(&user).Update("password", string(hashedPassword)).Error
+	if err != nil {
+		utils.Log.Error("Failed to update password:", err)
+		return respcode.ERROR
+	}
+
+	return respcode.SUCCESS
+}

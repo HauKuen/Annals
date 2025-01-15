@@ -175,3 +175,49 @@ func EditUser(c *gin.Context) {
 		})
 	}
 }
+
+// ChangePassword 修改用户密码
+func ChangePassword(c *gin.Context) {
+	// 获取当前用户ID和角色
+	currentUserID := c.GetUint("user_id")
+	currentUserRole := c.GetInt("role")
+
+	// 获取目标用户ID
+	targetID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  respcode.BadRequest,
+			"message": respcode.GetErrMsg(respcode.BadRequest),
+		})
+		return
+	}
+
+	// 只允许管理员或用户本人修改密码
+	if currentUserRole == 0 && uint(targetID) != currentUserID {
+		c.JSON(http.StatusForbidden, gin.H{
+			"status":  respcode.ErrorNoPermission,
+			"message": respcode.GetErrMsg(respcode.ErrorNoPermission),
+		})
+		return
+	}
+
+	var passwordData struct {
+		OldPassword string `json:"old_password"`
+		NewPassword string `json:"new_password" binding:"required,min=6"`
+	}
+
+	if err := c.ShouldBindJSON(&passwordData); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  respcode.ErrorPasswordTooShort,
+			"message": respcode.GetErrMsg(respcode.ErrorPasswordTooShort),
+		})
+		return
+	}
+
+	code := model.ChangeUserPassword(uint(targetID), passwordData.OldPassword, passwordData.NewPassword, currentUserRole == 1)
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  code,
+		"message": respcode.GetErrMsg(code),
+	})
+}

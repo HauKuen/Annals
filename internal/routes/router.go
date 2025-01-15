@@ -1,8 +1,9 @@
 package routes
 
 import (
-	"github.com/HauKuen/Annals/internal/utils/respcode"
 	"net/http"
+
+	"github.com/HauKuen/Annals/internal/utils/respcode"
 
 	v1 "github.com/HauKuen/Annals/internal/api/v1"
 	"github.com/HauKuen/Annals/internal/middleware"
@@ -37,6 +38,7 @@ func InitRouter() {
 			auth.POST("user/add", AdminRequired(), v1.AddUser)
 			auth.DELETE("user/delete/:id", AdminRequired(), v1.DeleteUser)
 			auth.PUT("user/edit/:id", v1.EditUser)
+			auth.PUT("user/password/:id", v1.ChangePassword)
 
 			// 分类相关接口
 			auth.POST("category/add", v1.AddCategory)
